@@ -3,6 +3,9 @@ import pandas as pd
 import numpy as np
 from operator import eq
 from numbers import Number
+from itertools import combinations
+from statsmodels.formula.api import ols
+from functools import partial
 
 
 class NumericFunction:
@@ -35,7 +38,7 @@ class NumericFunction:
         return 'NumericFunction: number valued function'
 
 
-class BalanceFunction:
+class BalanceObjective:
 
     @property
     def balance_func(self):
@@ -65,7 +68,44 @@ class BalanceFunction:
         return idxs
 
 
-class MahalanobisBalance(BalanceFunction):
+id = lambda x: x
+min_across_covariates = partial(np.min, axis=1)
+
+class MahalanobisBalance(BalanceObjective):
+    def __init__(self, treatment_aggregator=id):
+        self.treatment_aggregator = treatment_aggregator
 
     def _balance_func(self, df, assignments):
-        return sum(assignments) #df.mean()
+        inverse_cov = np.linalg.inv(df.cov())
+        means = [df.loc[idx].mean() for idx in
+                 self.assignment_indices(df, assignments)]
+        combs = list(combinations(range(len(means)), 2))
+        mean_diffs = [means[a] - means[b] for a, b in combs]
+        res = pd.DataFrame(data=[mean_diff @ inverse_cov @ mean_diff
+                                 for mean_diff in mean_diffs],
+                           index=['{}-{}'.format(a, b) for a, b in combs])
+        return -self.treatment_aggregator(res)
+
+
+class PValueBalance(BalanceObjective):
+    def __init__(self, treatment_aggreagtor=id, covariate_aggregator=id):
+        self.treatment_aggregator = treatment_aggreagtor
+        self.covariate_aggregator = covariate_aggregator
+
+    def _balance_func(self, df, assignments):
+        pvalues = pd.DataFrame(dict((col, self.pvalues_by_col(
+            col, df, assignments)) for col in df.columns))
+        return self.covariate_aggregator(pvalues)
+
+    def pvalues_by_col(self, col, df, assignments):
+        return self.treatment_aggregator(self.ols_col_on_treatment(
+            col, df, assignments).pvalues.iloc[1:].values)
+
+    @staticmethod
+    def ols_col_on_treatment(col, df, assignments):
+        t_dummies = pd.DataFrame(
+            dict(('t{}'.format(i), df.index.isin(assignment))
+                 for i, assignment in enumerate(assignments)))
+        data = pd.concat((df, t_dummies), axis=1)
+        formula = '{} ~ 1 + {}'.format(col, ' + '.join(t_dummies.columns))
+        return ols(formula, data=data).fit()

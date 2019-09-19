@@ -2,7 +2,7 @@ from numpy.testing import TestCase, assert_array_almost_equal, \
     assert_almost_equal
 import pandas as pd
 import numpy as np
-from balance import NumericFunction, BalanceFunction, MahalanobisBalance
+from balance import NumericFunction, BalanceObjective, MahalanobisBalance
 
 
 class TestNumericFunction(TestCase):
@@ -38,27 +38,35 @@ class TestBalance(TestCase):
         self.assignment = set(
             np.random.choice(self.df.index, size=5, replace=False))
 
-    def test_balance_function(self):
+    def test_balance_objective(self):
         assert_array_almost_equal(
-            BalanceFunction._idxs_from_assignment(
+            BalanceObjective._idxs_from_assignment(
                 self.df, [self.assignment, [2, 3]]),
-            [[0, 0, 0, 0, 1, 1, 1, 1, 0, 1], [0, 0, 1, 1, 0, 0, 0, 0, 0, 0]]
-        )
+            [[0, 0, 0, 0, 1, 1, 1, 1, 0, 1], [0, 0, 1, 1, 0, 0, 0, 0, 0, 0]])
         assert_array_almost_equal(
-            BalanceFunction.assignment_indices(
+            BalanceObjective.assignment_indices(
                 self.df, [self.assignment, [2, 3]]),
             [[0, 0, 0, 0, 1, 1, 1, 1, 0, 1], [0, 0, 1, 1, 0, 0, 0, 0, 0, 0],
-             [1, 1, 0, 0, 0, 0, 0, 0, 1, 0]]
-        )
+             [1, 1, 0, 0, 0, 0, 0, 0, 1, 0]])
         assert_array_almost_equal(
-            BalanceFunction.assignment_indices(
+            BalanceObjective.assignment_indices(
                 self.df, [np.array([0, 0, 0, 0, 1, 1, 1, 1, 0, 1])]),
-            [[0, 0, 0, 0, 1, 1, 1, 1, 0, 1], [1, 1, 1, 1, 0, 0, 0, 0, 1, 0]]
-        )
+            [[0, 0, 0, 0, 1, 1, 1, 1, 0, 1], [1, 1, 1, 1, 0, 0, 0, 0, 1, 0]])
 
-    def test_mahalanobis(self):
+    def test_mahalanobis_id(self):
         maha = MahalanobisBalance().balance_func
         assert isinstance(maha, NumericFunction)
         assert_array_almost_equal(
-            maha(self.df, self.assignment), sum(self.assignment))
+            maha(self.df, [self.assignment, [2, 3]]).T,
+            [[-1.1719512, -0.9992989, -0.0849675]])
+        assert_array_almost_equal(
+            maha(self.df, [self.assignment]), [[-1.047968]])
+
+    def test_mahalanobis_max(self):
+        maha_max = MahalanobisBalance(np.max).balance_func
+        assert_almost_equal(
+            maha_max(self.df, [self.assignment, [2, 3]]), [-1.1719512])
+
+    def test_pvalues(self):
+        pass
 
