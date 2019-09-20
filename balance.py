@@ -68,11 +68,12 @@ class BalanceObjective:
         return idxs
 
 
-id = lambda x: x
+identity = lambda x: x
 min_across_covariates = partial(np.min, axis=1)
 
+
 class MahalanobisBalance(BalanceObjective):
-    def __init__(self, treatment_aggregator=id):
+    def __init__(self, treatment_aggregator=identity):
         self.treatment_aggregator = treatment_aggregator
 
     def _balance_func(self, df, assignments):
@@ -88,18 +89,22 @@ class MahalanobisBalance(BalanceObjective):
 
 
 class PValueBalance(BalanceObjective):
-    def __init__(self, treatment_aggreagtor=id, covariate_aggregator=id):
+    def __init__(self, treatment_aggreagtor=identity,
+                 covariate_aggregator=identity):
         self.treatment_aggregator = treatment_aggreagtor
         self.covariate_aggregator = covariate_aggregator
 
     def _balance_func(self, df, assignments):
-        pvalues = pd.DataFrame(dict((col, self.pvalues_by_col(
-            col, df, assignments)) for col in df.columns))
-        return self.covariate_aggregator(pvalues)
+        pvalues = dict((col, self.pvalues_by_col(
+            col, df, assignments)) for col in df.columns)
+        return self.covariate_aggregator(pd.DataFrame(pvalues))
 
     def pvalues_by_col(self, col, df, assignments):
-        return self.treatment_aggregator(self.ols_col_on_treatment(
+        pv = self.treatment_aggregator(self.ols_col_on_treatment(
             col, df, assignments).pvalues.iloc[1:].values)
+        if isinstance(pv, Number):
+            pv = [pv]
+        return pv
 
     @staticmethod
     def ols_col_on_treatment(col, df, assignments):

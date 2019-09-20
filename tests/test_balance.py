@@ -2,7 +2,9 @@ from numpy.testing import TestCase, assert_array_almost_equal, \
     assert_almost_equal
 import pandas as pd
 import numpy as np
-from balance import NumericFunction, BalanceObjective, MahalanobisBalance
+from balance import NumericFunction, BalanceObjective, MahalanobisBalance, \
+    PValueBalance, min_across_covariates, identity
+from parameterized import parameterized
 
 
 class TestNumericFunction(TestCase):
@@ -68,5 +70,19 @@ class TestBalance(TestCase):
             maha_max(self.df, [self.assignment, [2, 3]]), [-1.1719512])
 
     def test_pvalues(self):
-        pass
+        pv_balance = PValueBalance().balance_func
+        assert_array_almost_equal(
+            pv_balance(self.df, [self.assignment, [2, 3]]),
+            [[0.320395, 0.523023], [0.892326, 0.790063]])
 
+    @parameterized.expand([
+        [np.min, min_across_covariates, 0.320395],
+        [identity, min_across_covariates, [0.320395, 0.790063]],
+        [np.min, identity, [[0.320395, 0.523023]]],
+    ])
+    def test_pvalue_agg(self, t_agg, c_agg, expected):
+        pv_balance = PValueBalance(
+            treatment_aggreagtor=t_agg,
+            covariate_aggregator=c_agg).balance_func
+        assert_array_almost_equal(
+            pv_balance(self.df, [self.assignment, [2, 3]]), expected)
