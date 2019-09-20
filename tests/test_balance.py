@@ -6,7 +6,7 @@ from numpy.testing import TestCase, assert_array_almost_equal, \
 
 from balance import NumericFunction, BalanceObjective, MahalanobisBalance, \
     PValueBalance, BlockBalance, min_across_covariates, identity, \
-    pvalues_report
+    pvalues_report, max_absolute_value, max_across_covariates
 
 
 class TestNumericFunction(TestCase):
@@ -27,6 +27,11 @@ class TestNumericFunction(TestCase):
 
     def test_add(self):
         assert (self.f + self.g)(1) == 5 == (self.g + self.f)(1)
+
+    def test_neg(self):
+        assert (-self.f + self.g)(1) == 1 == (self.g - self.f)(1)
+        assert (self.f - self.g)(1) == -1
+        assert (-self.f)(1) == -2
 
     def test_multiply(self):
         assert (self.f * self.g)(1) == (self.g * self.f)(1) == 6
@@ -117,5 +122,19 @@ class TestBalance(TestCase):
         block_res = BlockBalance().balance_func(self.df_cat, [self.assignment])
         assert_array_equal(block_res.columns, ['cat1', 'cat2'])
         assert_array_almost_equal(
-            block_res, [[.5, 1], [.5, 1.]]
+            block_res, [[-.5, -1], [-.5, -1.]]
+        )
+
+    @parameterized.expand([
+        [max_absolute_value, np.max, identity, [[-.5, -1]]],
+        [np.abs, np.max, identity, [[-0, -.25], [-.5, -1], [-.5, np.NAN]]],
+        [max_absolute_value, np.max, max_across_covariates, [-1]]
+    ])
+    def test_block_balance_agg(self, cat_agg, treat_agg, cov_agg, expected):
+        block_res = BlockBalance(
+            covariate_aggregator=cov_agg, category_aggregator=cat_agg,
+            treatment_aggreagtor=treat_agg
+        ).balance_func(self.df_cat, [self.assignment])
+        assert_array_almost_equal(
+            block_res, expected
         )
