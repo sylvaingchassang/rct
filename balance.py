@@ -68,8 +68,13 @@ class BalanceObjective:
         return idxs
 
 
-identity = lambda x: x
+def identity(x): return x
+
+
 min_across_covariates = partial(np.min, axis=1)
+
+
+def max_absolute_value(x): return np.max(np.abs(x))
 
 
 class MahalanobisBalance(BalanceObjective):
@@ -114,3 +119,38 @@ class PValueBalance(BalanceObjective):
         data = pd.concat((df, t_dummies), axis=1)
         formula = '{} ~ 1 + {}'.format(col, ' + '.join(t_dummies.columns))
         return ols(formula, data=data).fit()
+
+
+def pvalues_report(df, assignments):
+    idx = ['t{}'.format(i+1) for i in range(len(assignments))]
+    report = PValueBalance().balance_func(df, assignments)
+    report.index = idx
+    return report
+
+
+class BlockBalance(BalanceObjective):
+
+    def __init__(self, treatment_aggreagtor=identity,
+                 covariate_aggregator=identity,
+                 category_aggregator=max_absolute_value):
+        self.treatment_aggregator = treatment_aggreagtor
+        self.covariate_aggregator = covariate_aggregator
+        self.category_aggregator = category_aggregator
+
+    def _balance_func(self, df, assignments):
+        relative_count_all = dict((col, self.relative_count_by_col(
+            col, df, assignments)) for col in df.columns)
+        return self.covariate_aggregator(pd.DataFrame(relative_count_all))
+
+    def relative_count_by_col(self, col, df, assignments):
+        df_count = self.count_by_col(col, df, assignments)
+        relative_dev = (df_count - df_count.median()) / df_count.median()
+        return self.treatment_aggregator(
+            relative_dev.apply(self.category_aggregator, axis=1))
+
+    def count_by_col(self, col, df, assignments):
+        cat = sorted(list(set(df[col])))
+        idxs = self.assignment_indices(df, assignments)
+        count = [[sum(df[col].loc[idx].eq(v)) for v in cat] for idx in idxs]
+        return pd.DataFrame(data=count, columns=cat,
+                            index=['t{}'.format(i) for i in range(len(idxs))])

@@ -1,10 +1,12 @@
-from numpy.testing import TestCase, assert_array_almost_equal, \
-    assert_almost_equal
 import pandas as pd
 import numpy as np
-from balance import NumericFunction, BalanceObjective, MahalanobisBalance, \
-    PValueBalance, min_across_covariates, identity
 from parameterized import parameterized
+from numpy.testing import TestCase, assert_array_almost_equal, \
+    assert_almost_equal, assert_array_equal
+
+from balance import NumericFunction, BalanceObjective, MahalanobisBalance, \
+    PValueBalance, BlockBalance, min_across_covariates, identity, \
+    pvalues_report
 
 
 class TestNumericFunction(TestCase):
@@ -39,6 +41,10 @@ class TestBalance(TestCase):
             columns=['a', 'b'])
         self.assignment = set(
             np.random.choice(self.df.index, size=5, replace=False))
+        df_cat = (0. * (self.df['a'] < .3) + 1. * self.df['a'].between(.3, .6)
+                  + 2. * (self.df['a'] > .6))
+        self.df_cat = df_cat.to_frame('cat1')
+        self.df_cat['cat2'] = 1. * (self.df['b'] < .5)
 
     def test_balance_objective(self):
         assert_array_almost_equal(
@@ -86,3 +92,30 @@ class TestBalance(TestCase):
             covariate_aggregator=c_agg).balance_func
         assert_array_almost_equal(
             pv_balance(self.df, [self.assignment, [2, 3]]), expected)
+
+    def test_pvalues_report(self):
+        report = pvalues_report(self.df, [self.assignment, [2, 3]])
+        assert_array_equal(report.columns, ['a', 'b'])
+        assert_array_equal(report.index, ['t1', 't2'])
+        assert_array_almost_equal(
+            report, [[0.320395, 0.523023], [0.892326, 0.790063]])
+
+    def test_count_by_col(self):
+        assert_array_almost_equal(
+            BlockBalance().count_by_col('cat1', self.df_cat,
+                                        [self.assignment]),
+            [[1, 1, 3], [1, 3, 1]]
+        )
+
+    def test_relative_count_by_col(self):
+        assert_array_almost_equal(BlockBalance().relative_count_by_col(
+            'cat1', self.df_cat, [self.assignment]),
+            [0.5, 0.5]
+        )
+
+    def test_block_balance(self):
+        block_res = BlockBalance().balance_func(self.df_cat, [self.assignment])
+        assert_array_equal(block_res.columns, ['cat1', 'cat2'])
+        assert_array_almost_equal(
+            block_res, [[.5, 1], [.5, 1.]]
+        )
