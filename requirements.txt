@@ -5,3 +5,4 @@ statsmodels==0.10.1
 pytest==5.1.2
 pytest-cov==2.7.1
 parameterized==0.7.0
+lazy-property==0.0.1
