@@ -1,50 +1,12 @@
 import abc
 import pandas as pd
 import numpy as np
-from operator import eq
 from numbers import Number
 from itertools import combinations
 from statsmodels.formula.api import ols
 from functools import partial
 
-
-class NumericFunction:
-    @classmethod
-    def numerize(cls, f):
-        return NumericFunction(f)
-
-    def __init__(self, f):
-        self.func = f
-
-    def __call__(self, *args, **kwargs):
-        return self.func(*args, **kwargs)
-
-    def __add__(self, other):
-        return self.numerize(lambda x: self(x) + other(x))
-
-    def __radd__(self, other):
-        return self.__add__(other)
-
-    def __neg__(self):
-        return self.numerize(lambda x: - self(x))
-
-    def __sub__(self, other):
-        return self.numerize(lambda x: self(x) - other(x))
-
-    def __rsub__(self, other):
-        return self.numerize(lambda x: -self(x) + other(x))
-
-    def __mul__(self, other):
-        if isinstance(other, Number):
-            return self.numerize(lambda x: self(x) * other)
-        else:
-            return self.numerize(lambda x: self(x) * other(x))
-
-    def __rmul__(self, other):
-        return self.__mul__(other)
-
-    def __str__(self):
-        return 'NumericFunction: number valued function'
+from utils import NumericFunction
 
 
 def identity(x): return x

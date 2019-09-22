@@ -4,38 +4,11 @@ from parameterized import parameterized
 from numpy.testing import TestCase, assert_array_almost_equal, \
     assert_almost_equal, assert_array_equal
 
-from balance import NumericFunction, BalanceObjective, MahalanobisBalance, \
+from balance import BalanceObjective, MahalanobisBalance, \
     PValueBalance, BlockBalance, min_across_covariates, identity, \
     pvalues_report, max_absolute_value, max_across_covariates
 
-
-class TestNumericFunction(TestCase):
-    def setUp(self):
-        @NumericFunction.numerize
-        def f(x):
-            return 2 * x
-        self.f = f
-
-        def g(x):
-            return 3 * x
-        self.g = g
-
-    def test_type(self):
-        assert isinstance(self.f, NumericFunction)
-        assert not isinstance(self.g, NumericFunction)
-        assert str(self.f) == 'NumericFunction: number valued function'
-
-    def test_add(self):
-        assert (self.f + self.g)(1) == 5 == (self.g + self.f)(1)
-
-    def test_neg(self):
-        assert (-self.f + self.g)(1) == 1 == (self.g - self.f)(1)
-        assert (self.f - self.g)(1) == -1
-        assert (-self.f)(1) == -2
-
-    def test_multiply(self):
-        assert (self.f * self.g)(1) == (self.g * self.f)(1) == 6
-        assert (.6 * self.f + self.g)(1) == (self.g + .6 * self.f)(1) == 4.2
+from utils import NumericFunction
 
 
 class TestBalance(TestCase):
