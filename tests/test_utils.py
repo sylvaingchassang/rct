@@ -1,6 +1,6 @@
 from numpy.testing import TestCase
 
-from utils import NumericFunction, LexTuple, QuantileTarget
+from ..utils import NumericFunction, LexTuple, QuantileTarget
 
 
 class TestNumericFunction(TestCase):

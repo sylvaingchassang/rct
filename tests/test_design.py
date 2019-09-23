@@ -1,9 +1,9 @@
 from numpy.testing import TestCase, assert_array_almost_equal
 from os import path
 
-from design import RCT, KRerandomizedRCT, QuantileTargetingRCT
-from balance import MahalanobisBalance, pvalues_report
-from assignment import get_assignments_by_positions
+from ..design import RCT, KRerandomizedRCT, QuantileTargetingRCT
+from ..balance import MahalanobisBalance, pvalues_report
+from ..assignment import get_assignments_by_positions
 
 
 class TestRCT(TestCase):

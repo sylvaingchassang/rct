@@ -4,7 +4,7 @@ from numpy.testing import assert_array_almost_equal, assert_array_equal
 from random import seed
 from itertools import zip_longest
 
-from assignment import clean_weights, draw_iid_assignment, \
+from ..assignment import clean_weights, draw_iid_assignment, \
     draw_shuffled_assignment, get_assignments_by_positions
 
 

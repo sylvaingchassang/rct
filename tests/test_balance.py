@@ -4,11 +4,11 @@ from parameterized import parameterized
 from numpy.testing import TestCase, assert_array_almost_equal, \
     assert_almost_equal, assert_array_equal
 
-from balance import BalanceObjective, MahalanobisBalance, \
+from ..balance import BalanceObjective, MahalanobisBalance, \
     PValueBalance, BlockBalance, min_across_covariates, identity, \
     pvalues_report, max_absolute_value, max_across_covariates
 
-from utils import NumericFunction
+from ..utils import NumericFunction
 
 
 class TestBalance(TestCase):

@@ -6,10 +6,10 @@ import lazy_property
 import pandas as pd
 import numpy as np
 
-from assignment import draw_iid_assignment, draw_shuffled_assignment, \
+from .assignment import draw_iid_assignment, draw_shuffled_assignment, \
     get_assignments_by_positions
-from balance import BalanceObjective
-from utils import QuantileTarget
+from .balance import BalanceObjective
+from .utils import QuantileTarget
 
 
 class RCTBase:

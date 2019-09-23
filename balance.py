@@ -6,7 +6,7 @@ from itertools import combinations
 from statsmodels.formula.api import ols
 from functools import partial
 
-from utils import NumericFunction
+from .utils import NumericFunction
 
 
 def identity(x): return x
