@@ -76,6 +76,9 @@ class OrderedTupleBase:
         return '{}({})'.format(self.__class__.__name__,
                                ', '.join([str(a) for a in self.args]))
 
+    def __iter__(self):
+        return iter(self.args)
+
     @staticmethod
     def _args(other):
         return other.args if isinstance(other, OrderedTupleBase) else other
@@ -96,10 +99,10 @@ class LexTuple(OrderedTupleBase):
 
 
 class QuantileTarget:
-    def __init__(self, q, objective_fun, generator_sample):
+    def __init__(self, q, objective_fun, generator_sample, len_generator):
         self.f = objective_fun
         self.generator = generator_sample
-        self.num_q = q if q > 1 else int(q * len(generator_sample))
+        self.num_q = q if q > 1 else int(q * len_generator)
         self.quantiles = deque([], maxlen=self.num_q)
 
     def compute_best(self):

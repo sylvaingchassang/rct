@@ -113,10 +113,8 @@ class KRerandomizedRCT(BalancedRCTBase):
 class QuantileTargetingRCT(BalancedRCTBase):
     def __init__(self, objective: BalanceObjective, file_path, weights,
                  quantile_target=None, seed=0, num_monte_carlo=1000):
-        super().__init__(file_path, weights, seed)
-        self._balance = objective.balance_func
+        super().__init__(objective, file_path, weights, num_monte_carlo, seed)
         self.quantile_target = quantile_target
-        self._k = num_monte_carlo
 
     def balance(self, assignment):
         return float(self._balance(
@@ -135,8 +133,9 @@ class QuantileTargetingRCT(BalancedRCTBase):
         return self.get_target_assignments(assignments)
 
     def get_target_assignments(self, assignments):
+        random.seed(self.seed + 1)
         qtargets = QuantileTarget(
-            self.quantile_target, self.balance, assignments)
+            self.quantile_target, self.balance, assignments, self.k)
         qtargets.compute_best()
         _, selected_assignment = random.choice(qtargets.quantiles)
-        return selected_assignment
+        return self.as_frame(selected_assignment)

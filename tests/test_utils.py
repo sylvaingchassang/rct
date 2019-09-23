@@ -72,7 +72,7 @@ class TestLexOrderedTuple(TestCase):
 class TestQuantileTarget:
 
     def test_pop_insort(self):
-        qs = QuantileTarget(.2, lambda x: x ** 2 - 1, range(10))
+        qs = QuantileTarget(.2, lambda x: x ** 2 - 1, range(10), 10)
         qs._pop_insort(0, 1)
         assert list(qs.quantiles) == [(0, 1)]
         qs._pop_insort(3, 2)
@@ -83,6 +83,6 @@ class TestQuantileTarget:
         assert list(qs.quantiles) == [(2, 6), (3, 2)]
 
     def test_quantile_target(self):
-        qs = QuantileTarget(.2, lambda x: -x ** 2 + 2 * x, range(10))
+        qs = QuantileTarget(.2, lambda x: -x ** 2 + 2 * x, range(10), 10)
         qs.compute_best()
         assert list(qs.quantiles) == [(0, 2), (1, 1)]

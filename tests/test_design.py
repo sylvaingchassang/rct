@@ -1,8 +1,7 @@
 from numpy.testing import TestCase, assert_array_almost_equal
 from os import path
-from parameterized import parameterized
 
-from design import RCT, KRerandomizedRCT
+from design import RCT, KRerandomizedRCT, QuantileTargetingRCT
 from balance import MahalanobisBalance, pvalues_report
 from assignment import get_assignments_by_positions
 
@@ -69,6 +68,11 @@ class TestKRerandomized(TestCase):
             self.krerand.assignment_from_iid[:10].T,
             [[1, 1, 1, 1, 0, 0, 0, 1, 0, 0]])
 
+    def test_shuffled_krerand(self):
+        assert_array_almost_equal(
+            self.krerand.assignment_from_shuffled[:10].T,
+            [[0, 0, 1, 1, 0, 1, 1, 1, 1, 0]])
+
     def test_iid_balance(self):
         assert_array_almost_equal(
             pvalues_report(
@@ -84,3 +88,50 @@ class TestKRerandomized(TestCase):
                 get_assignments_by_positions(
                     self.krerand.assignment_from_shuffled)),
             [[0.719567, 0.895064, 0.842654]])
+
+
+class TestQuantileTargetingRCT(TestCase):
+    def setUp(self):
+        self.file = path.join(path.dirname(__file__), 'example_covariates.csv')
+        self.maha = MahalanobisBalance()
+        self.qt_rct = QuantileTargetingRCT(
+            self.maha, self.file, [.5, .5], .05, num_monte_carlo=100)
+
+    def test_quantile_target(self):
+        assert_array_almost_equal(self.qt_rct.quantile_target, .05)
+
+    def test_hash_int(self):
+        assert (self.qt_rct.file_hash_int ==
+                151671729980354795404869707092356732292)
+
+    def test_seed(self):
+        assert (self.qt_rct.seed == 2705298820)
+
+    def test_k(self):
+        assert self.qt_rct.k == 100
+
+    def test_iid_qt_rct(self):
+        assert_array_almost_equal(
+            self.qt_rct.assignment_from_iid[:10].T,
+            [[0, 1, 0, 1, 0, 1, 0, 1, 1, 1]])
+
+    def test_shuffled_qt_rct(self):
+        assert_array_almost_equal(
+            self.qt_rct.assignment_from_shuffled[:10].T,
+            [[0, 1, 1, 1, 0, 1, 0, 1, 1, 0]])
+
+    def test_iid_balance(self):
+        assert_array_almost_equal(
+            pvalues_report(
+                self.qt_rct.df,
+                get_assignments_by_positions(
+                    self.qt_rct.assignment_from_iid)),
+            [[0.87299 , 0.741099, 0.842654]])
+
+    def test_shuffled_balance(self):
+        assert_array_almost_equal(
+            pvalues_report(
+                self.qt_rct.df,
+                get_assignments_by_positions(
+                    self.qt_rct.assignment_from_shuffled)),
+            [[0.82268, 0.82947, 0.551186]])
