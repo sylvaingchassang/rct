@@ -13,7 +13,8 @@ def clean_weights(weights):
     return weights
 
 
-def get_assignments_by_positions(assignment):
+def get_assignments_as_positions(assignment):
+    #assignment = np.array(assignment)
     return [np.where(np.array(assignment) == i)[0]
             for i in range(max(assignment) + 1)]
 

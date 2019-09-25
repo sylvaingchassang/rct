@@ -7,7 +7,7 @@ import pandas as pd
 import numpy as np
 
 from .assignment import draw_iid_assignment, draw_shuffled_assignment, \
-    get_assignments_by_positions
+    get_assignments_as_positions
 from .balance import BalanceObjective
 from .utils import QuantileTarget
 
@@ -86,7 +86,7 @@ class BalancedRCTBase(RCTBase):
 
     def balance(self, assignment):
         return float(self._balance(
-            self.df, get_assignments_by_positions(assignment)).values)
+            self.df, get_assignments_as_positions(assignment)).values)
 
     def assignment_generator(self, draw_fun):
         return (draw_fun(self.weights, self.sample_size) for _ in range(
@@ -118,7 +118,7 @@ class QuantileTargetingRCT(BalancedRCTBase):
 
     def balance(self, assignment):
         return float(self._balance(
-            self.df, get_assignments_by_positions(assignment)).values)
+            self.df, get_assignments_as_positions(assignment)).values)
 
     @property
     def assignment_from_iid(self):

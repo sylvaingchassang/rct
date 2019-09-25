@@ -89,6 +89,7 @@ class PValueBalance(BalanceObjective):
             dict(('t{}'.format(i), df.index.isin(assignment))
                  for i, assignment in enumerate(assignments)))
         data = pd.concat((df, t_dummies), axis=1)
+        is_collinear = t_dummies.min()
         formula = '{} ~ 1 + {}'.format(col, ' + '.join(t_dummies.columns))
         return ols(formula, data=data).fit()
 

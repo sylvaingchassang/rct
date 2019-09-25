@@ -3,7 +3,7 @@ from os import path
 
 from ..design import RCT, KRerandomizedRCT, QuantileTargetingRCT
 from ..balance import MahalanobisBalance, pvalues_report
-from ..assignment import get_assignments_by_positions
+from ..assignment import get_assignments_as_positions
 
 
 class TestRCT(TestCase):
@@ -37,12 +37,12 @@ class TestRCT(TestCase):
 
     def test_iid_balance(self):
         assert_array_almost_equal(
-            pvalues_report(self.rct.df, get_assignments_by_positions(
+            pvalues_report(self.rct.df, get_assignments_as_positions(
                 self.rct.assignment_from_iid)), [[0.898257, 0.7013, 0.177232]])
 
     def test_shuffled_balance(self):
         assert_array_almost_equal(
-            pvalues_report(self.rct.df, get_assignments_by_positions(
+            pvalues_report(self.rct.df, get_assignments_as_positions(
                 self.rct.assignment_from_shuffled)),
             [[0.518609, 0.34273, 0.551186]])
 
@@ -77,7 +77,7 @@ class TestKRerandomized(TestCase):
         assert_array_almost_equal(
             pvalues_report(
                 self.krerand.df,
-                get_assignments_by_positions(
+                get_assignments_as_positions(
                     self.krerand.assignment_from_iid)),
             [[0.973345, 0.906685, 0.952433]])
 
@@ -85,7 +85,7 @@ class TestKRerandomized(TestCase):
         assert_array_almost_equal(
             pvalues_report(
                 self.krerand.df,
-                get_assignments_by_positions(
+                get_assignments_as_positions(
                     self.krerand.assignment_from_shuffled)),
             [[0.719567, 0.895064, 0.842654]])
 
@@ -124,7 +124,7 @@ class TestQuantileTargetingRCT(TestCase):
         assert_array_almost_equal(
             pvalues_report(
                 self.qt_rct.df,
-                get_assignments_by_positions(
+                get_assignments_as_positions(
                     self.qt_rct.assignment_from_iid)),
             [[0.87299 , 0.741099, 0.842654]])
 
@@ -132,6 +132,6 @@ class TestQuantileTargetingRCT(TestCase):
         assert_array_almost_equal(
             pvalues_report(
                 self.qt_rct.df,
-                get_assignments_by_positions(
+                get_assignments_as_positions(
                     self.qt_rct.assignment_from_shuffled)),
             [[0.82268, 0.82947, 0.551186]])

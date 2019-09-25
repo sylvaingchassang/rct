@@ -5,7 +5,7 @@ from random import seed
 from itertools import zip_longest
 
 from ..assignment import clean_weights, draw_iid_assignment, \
-    draw_shuffled_assignment, get_assignments_by_positions
+    draw_shuffled_assignment, get_assignments_as_positions
 
 
 def test_clean_weights():
@@ -41,4 +41,4 @@ def test_draw_shuffle(weights, expected):
 ])
 def test_get_assignments_by_position(assignment, expected):
     assert all(np.array_equal(a, b) for a, b in zip_longest(
-        get_assignments_by_positions(assignment), expected))
+        get_assignments_as_positions(assignment), expected))
