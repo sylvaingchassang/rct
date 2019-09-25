@@ -78,6 +78,11 @@ class TestBalance(TestCase):
         assert_array_almost_equal(
             report, [[0.320395, 0.523023], [0.892326, 0.790063]])
 
+    def test_pvalues_report_from_collinear(self):
+        report = pvalues_report(self.df, [self.assignment, [2, 3], [0, 1, 8]])
+        assert_array_almost_equal(
+            report, [[0.320395, 0.523023], [0.892326, 0.790063]])
+
     def test_count_by_col(self):
         assert_array_almost_equal(
             BlockBalance().count_by_col('cat1', self.df_cat,
