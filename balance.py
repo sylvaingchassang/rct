@@ -83,20 +83,26 @@ class PValueBalance(BalanceObjective):
             pv = [pv]
         return pv
 
-    @staticmethod
-    def ols_col_on_treatment(col, df, assignments):
+    def ols_col_on_treatment(self, col, df, assignments):
         t_dummies = pd.DataFrame(
             dict(('t{}'.format(i), df.index.isin(assignment))
                  for i, assignment in enumerate(assignments)))
         data = pd.concat((df, t_dummies), axis=1)
-        is_collinear = t_dummies.min()
-        formula = '{} ~ 1 + {}'.format(col, ' + '.join(t_dummies.columns))
+        sel_dummies = self._get_non_collinear_dummies(t_dummies)
+        formula = '{} ~ 1 + {}'.format(col, ' + '.join(sel_dummies))
         return ols(formula, data=data).fit()
+
+    def _get_non_collinear_dummies(self, t_dummies):
+        is_collinear = int(t_dummies.sum(axis=1).mean()) == 1
+        if is_collinear:
+            return t_dummies.columns[:-1]
+        else:
+            return t_dummies.columns
 
 
 def pvalues_report(df, assignments):
-    idx = ['t{}'.format(i+1) for i in range(len(assignments))]
     report = PValueBalance().balance_func(df, assignments)
+    idx = ['t{}'.format(i + 1) for i in range(len(report))]
     report.index = idx
     return report
 
