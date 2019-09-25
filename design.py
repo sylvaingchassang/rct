@@ -55,7 +55,7 @@ class RCTBase:
 
     def as_frame(self, assignment):
         return pd.DataFrame(
-            data=assignment, index=self.df.index)
+            data=assignment, index=self.df.index, columns=['t'])
 
 
 class RCT(RCTBase):

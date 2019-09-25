@@ -35,10 +35,10 @@ def test_draw_shuffle(weights, expected):
 
 
 @parameterized.expand([
-    [[0, 0, 0, 0, 1], [[0, 1, 2, 3], [4]]],
-    [[1, 1, 0, 0, 0], [[2, 3, 4], [0, 1]]],
-    [[0, 2, 0, 1], [[0, 2], [3], [1]]]
+    [[0, 0, 0, 0, 1], [[0, 1, 2, 3]]],
+    [[1, 1, 0, 0, 0], [[2, 3, 4]]],
+    [[0, 2, 0, 1], [[0, 2], [3]]]
 ])
-def test_get_assignments_by_position(assignment, expected):
+def test_get_assignments_as_position(assignment, expected):
     assert all(np.array_equal(a, b) for a, b in zip_longest(
         get_assignments_as_positions(assignment), expected))

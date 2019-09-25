@@ -14,9 +14,9 @@ def clean_weights(weights):
 
 
 def get_assignments_as_positions(assignment):
-    #assignment = np.array(assignment)
-    return [np.where(np.array(assignment) == i)[0]
-            for i in range(max(assignment) + 1)]
+    assignment = np.array(assignment)
+    return [np.where(assignment == i)[0]
+            for i in range(np.max(assignment))]
 
 
 def draw_iid_assignment(weights, sample_size):
