@@ -17,9 +17,16 @@ def max_absolute_value(x): return np.max(np.abs(x))
 
 min_across_covariates = partial(np.min, axis=1)
 max_across_covariates = partial(np.max, axis=1)
+mean_across_covariates = partial(np.mean, axis=1)
 
 
 class BalanceObjective:
+
+    def __init__(self, cols=None):
+        self._cols = cols
+
+    def col_selection(self, df):
+        return self._cols or df.columns
 
     @property
     def balance_func(self):
@@ -50,13 +57,15 @@ class BalanceObjective:
 
 
 class MahalanobisBalance(BalanceObjective):
-    def __init__(self, treatment_aggregator=identity):
+    def __init__(self, treatment_aggregator=identity, cols=None):
         self.treatment_aggregator = treatment_aggregator
+        super().__init__(cols)
 
     def _balance_func(self, df, assignments):
-        inverse_cov = np.linalg.inv(df.cov())
-        means = [df.loc[idx].mean() for idx in
-                 self.assignment_indices(df, assignments)]
+        df_sel = df[self.col_selection(df)]
+        inverse_cov = np.linalg.inv(df_sel.cov())
+        means = [df_sel.loc[idx].mean() for idx in
+                 self.assignment_indices(df_sel, assignments)]
         combs = list(combinations(range(len(means)), 2))
         mean_diffs = [means[a] - means[b] for a, b in combs]
         res = pd.DataFrame(data=[mean_diff @ inverse_cov @ mean_diff
@@ -67,13 +76,14 @@ class MahalanobisBalance(BalanceObjective):
 
 class PValueBalance(BalanceObjective):
     def __init__(self, treatment_aggreagtor=identity,
-                 covariate_aggregator=identity):
+                 covariate_aggregator=identity, cols=None):
         self.treatment_aggregator = treatment_aggreagtor
         self.covariate_aggregator = covariate_aggregator
+        super().__init__(cols)
 
     def _balance_func(self, df, assignments):
         pvalues = dict((col, self.pvalues_by_col(
-            col, df, assignments)) for col in df.columns)
+            col, df, assignments)) for col in self.col_selection(df))
         return self.covariate_aggregator(pd.DataFrame(pvalues))
 
     def pvalues_by_col(self, col, df, assignments):
@@ -111,14 +121,15 @@ class BlockBalance(BalanceObjective):
 
     def __init__(self, treatment_aggreagtor=identity,
                  covariate_aggregator=identity,
-                 category_aggregator=max_absolute_value):
+                 category_aggregator=max_absolute_value, cols=None):
         self.treatment_aggregator = treatment_aggreagtor
         self.covariate_aggregator = covariate_aggregator
         self.category_aggregator = category_aggregator
+        super().__init__(cols)
 
     def _balance_func(self, df, assignments):
         relative_count_all = dict((col, self.relative_count_by_col(
-            col, df, assignments)) for col in df.columns)
+            col, df, assignments)) for col in self.col_selection(df))
         return -self.covariate_aggregator(pd.DataFrame(relative_count_all))
 
     def relative_count_by_col(self, col, df, assignments):

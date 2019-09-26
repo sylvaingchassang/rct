@@ -72,10 +72,11 @@ class RCT(RCTBase):
 
 
 class BalancedRCTBase(RCTBase):
-    def __init__(self, objective: BalanceObjective,
+    def __init__(self, objective,
                  file_path, weights, k=None, seed=0):
         super().__init__(file_path, weights, seed)
-        self._balance = objective.balance_func
+        self._balance = objective.balance_func \
+            if isinstance(objective, BalanceObjective) else objective
         self._k = k
 
     @property
