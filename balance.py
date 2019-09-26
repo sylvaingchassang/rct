@@ -7,7 +7,7 @@ from statsmodels.formula.api import ols
 from functools import partial
 
 from .utils import NumericFunction
-
+from .assignment import get_assignments_as_positions
 
 def identity(x): return x
 
@@ -115,6 +115,8 @@ class PValueBalance(BalanceObjective):
 
 
 def pvalues_report(df, assignments):
+    if isinstance(assignments, pd.DataFrame):
+        assignments = get_assignments_as_positions(assignments)
     report = PValueBalance().balance_func(df, assignments)
     idx = ['t{}'.format(i + 1) for i in range(len(report))]
     report.index = idx

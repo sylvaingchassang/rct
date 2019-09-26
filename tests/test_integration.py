@@ -21,8 +21,7 @@ class TestIntegration(TestCase):
     @staticmethod
     def _save_assignment_details(df, assignment, name):
         test_data_path = path.join(DATA_PATH, name)
-        report = pvalues_report(df, get_assignments_as_positions(
-            assignment)).values.flatten()
+        report = pvalues_report(df, assignment).values.flatten()
         d = {'count': list(assignment['t'].value_counts()),
              'report': list(report)}
         with open(test_data_path, 'w+') as fh:
