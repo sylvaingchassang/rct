@@ -126,15 +126,11 @@ class TestQuantileTargetingRCT(TestCase):
     def test_iid_balance(self):
         assert_array_almost_equal(
             pvalues_report(
-                self.qt_rct.df,
-                get_assignments_as_positions(
-                    self.qt_rct.assignment_from_iid)),
-            [[0.87299 , 0.741099, 0.842654]])
+                self.qt_rct.df, self.qt_rct.assignment_from_iid),
+            [[0.87299, 0.741099, 0.842654]])
 
     def test_shuffled_balance(self):
         assert_array_almost_equal(
-            pvalues_report(
-                self.qt_rct.df,
-                get_assignments_as_positions(
-                    self.qt_rct.assignment_from_shuffled)),
+            pvalues_report(self.qt_rct.df,
+                           self.qt_rct.assignment_from_shuffled),
             [[0.82268, 0.82947, 0.551186]])

@@ -3,7 +3,7 @@ from numpy.testing import TestCase, assert_array_almost_equal
 import numpy as np
 from parameterized import parameterized
 
-from ..design import RCT, KRerandomizedRCT
+from ..design import RCT, KRerandomizedRCT, QuantileTargetingRCT
 from ..balance import pvalues_report, mahalanobis_balance, pvalue_balance, \
     block_balance
 from ..assignment import get_assignments_as_positions
@@ -45,6 +45,17 @@ class TestIntegration(TestCase):
             self._check_assignment_details(df, assignment, name)
 
     @parameterized.expand([
+        [[.5, .5], 'rct_2'],
+        [[.3, .3, .4],  'rct_3'],
+    ])
+    def test_rct(self, weights, name):
+        rct = RCT(COVARIATES_PATH, weights, seed=0)
+        for i, assignment in enumerate([rct.assignment_from_iid,
+                                        rct.assignment_from_shuffled]):
+            self.assert_assignment_matches(
+                cov_df, assignment, '{}_{}'.format(name, i))
+
+    @parameterized.expand([
         [[.5, .5], pvalue_balance(), 'krct_2_pvalue'],
         [[.3, .3, .4], pvalue_balance(), 'krct_3_pvalue'],
         [[.5, .5], mahalanobis_balance(), 'krct_2_mahalanobis'],
@@ -65,12 +76,22 @@ class TestIntegration(TestCase):
                 cov_df, assignment, '{}_{}'.format(name, i))
 
     @parameterized.expand([
-        [[.5, .5], 'rct_2'],
-        [[.3, .3, .4],  'rct_3'],
+        [[.5, .5], pvalue_balance(), 'qrct_2_pvalue'],
+        [[.3, .3, .4], pvalue_balance(), 'qrct_3_pvalue'],
+        [[.5, .5], mahalanobis_balance(), 'qrct_2_mahalanobis'],
+        [[.3, .3, .4], mahalanobis_balance(), 'qrct_3_mahalanobis'],
+        [[.5, .5], block_balance(['C']), 'qrct_2_block'],
+        [[.3, .3, .4], block_balance(['C']), 'qrct_3_block'],
+        [[.5, .5], mahalanobis_balance(['A', 'B']) + block_balance(['C']),
+         'qrct_2_mixed'],
+        [[.3, .3, .4], mahalanobis_balance(['A', 'B']) + block_balance(['C']),
+         'qrct_3_mixed']
     ])
-    def test_rct(self, weights, name):
-        rct = RCT(COVARIATES_PATH, weights, seed=0)
-        for i, assignment in enumerate([rct.assignment_from_iid,
-                                        rct.assignment_from_shuffled]):
+    def test_qrct(self, weights, balance, name):
+        qrct = QuantileTargetingRCT(
+            balance, COVARIATES_PATH, weights, quantile_target=.05, seed=0,
+            num_monte_carlo=200)
+        for i, assignment in enumerate([qrct.assignment_from_iid,
+                                        qrct.assignment_from_shuffled]):
             self.assert_assignment_matches(
-                cov_df, assignment, '{}_{}'.format(name, i))
+                cov_df, assignment, '{}_{}'.format(name, i), True)

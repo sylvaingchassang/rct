@@ -93,6 +93,8 @@ class LexTuple(OrderedTupleBase):
                     return True
                 elif a > b:
                     return False
+            except ValueError:
+                return False
             except TypeError:
                 return False
         return False

@@ -72,8 +72,7 @@ class RCT(RCTBase):
 
 
 class BalancedRCTBase(RCTBase):
-    def __init__(self, objective,
-                 file_path, weights, k=None, seed=0):
+    def __init__(self, objective, file_path, weights, k=None, seed=0):
         super().__init__(file_path, weights, seed)
         self._balance = objective.balance_func \
             if isinstance(objective, BalanceObjective) else objective
@@ -112,7 +111,7 @@ class KRerandomizedRCT(BalancedRCTBase):
 
 
 class QuantileTargetingRCT(BalancedRCTBase):
-    def __init__(self, objective: BalanceObjective, file_path, weights,
+    def __init__(self, objective, file_path, weights,
                  quantile_target=None, seed=0, num_monte_carlo=1000):
         super().__init__(objective, file_path, weights, num_monte_carlo, seed)
         self.quantile_target = quantile_target
