@@ -74,6 +74,10 @@ class MahalanobisBalance(BalanceObjective):
         return -self.treatment_aggregator(res)
 
 
+def mahalanobis_balance(cols=None):
+    return MahalanobisBalance(np.max, cols=cols).balance_func
+
+
 class PValueBalance(BalanceObjective):
     def __init__(self, treatment_aggreagtor=identity,
                  covariate_aggregator=identity, cols=None):
@@ -117,6 +121,14 @@ def pvalues_report(df, assignments):
     return report
 
 
+def pvalue_balance(cols=None):
+    return PValueBalance(
+        treatment_aggreagtor=np.min,
+        covariate_aggregator=min_across_covariates,
+        cols=cols
+    ).balance_func
+
+
 class BlockBalance(BalanceObjective):
 
     def __init__(self, treatment_aggreagtor=identity,
@@ -145,3 +157,8 @@ class BlockBalance(BalanceObjective):
         count = [[sum(df[col].loc[idx].eq(v)) for v in cat] for idx in idxs]
         return pd.DataFrame(data=count, columns=cat,
                             index=['t{}'.format(i) for i in range(len(idxs))])
+
+
+def block_balance(cols=None):
+    return BlockBalance(
+        np.max, max_across_covariates, cols=cols).balance_func

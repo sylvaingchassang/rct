@@ -4,8 +4,8 @@ import numpy as np
 from parameterized import parameterized
 
 from ..design import RCT, KRerandomizedRCT
-from ..balance import pvalues_report, MahalanobisBalance, PValueBalance, \
-    min_across_covariates
+from ..balance import pvalues_report, mahalanobis_balance, pvalue_balance, \
+    block_balance
 from ..assignment import get_assignments_as_positions
 
 from os import path
@@ -14,9 +14,6 @@ DATA_PATH = path.join(path.dirname(__file__), 'test_data')
 COVARIATES_PATH = path.join(DATA_PATH, 'example_covariates.csv')
 
 cov_df = pd.read_csv(COVARIATES_PATH)
-
-pvalue_balance = PValueBalance(
-    treatment_aggreagtor=np.min, covariate_aggregator=min_across_covariates)
 
 
 class TestIntegration(TestCase):
@@ -49,13 +46,32 @@ class TestIntegration(TestCase):
             self._check_assignment_details(df, assignment, name)
 
     @parameterized.expand([
-        [[.5, .5], pvalue_balance, 'krct_2_pvalue'],
-        [[.3, .3, .4], pvalue_balance, 'krct_3_pvalue']
+        [[.5, .5], pvalue_balance(), 'krct_2_pvalue'],
+        [[.3, .3, .4], pvalue_balance(), 'krct_3_pvalue'],
+        [[.5, .5], mahalanobis_balance(), 'krct_2_mahalanobis'],
+        [[.3, .3, .4], mahalanobis_balance(), 'krct_3_mahalanobis'],
+        [[.5, .5], block_balance(['C']), 'krct_2_block'],
+        [[.3, .3, .4], block_balance(['C']), 'krct_3_block'],
+        [[.5, .5], mahalanobis_balance(['A', 'B']) + block_balance(['C']),
+         'krct_2_mixed'],
+        [[.3, .3, .4],  mahalanobis_balance(['A', 'B']) + block_balance(['C']),
+         'krct_3_mixed']
     ])
     def test_krct(self, weights, balance, name):
         krct = KRerandomizedRCT(
             balance, COVARIATES_PATH, weights, k=20, seed=0)
         for i, assignment in enumerate([krct.assignment_from_iid,
                                         krct.assignment_from_shuffled]):
+            self.assert_assignment_matches(
+                cov_df, assignment, '{}_{}'.format(name, i))
+
+    @parameterized.expand([
+        [[.5, .5], 'rct_2'],
+        [[.3, .3, .4],  'rct_3'],
+    ])
+    def test_rct(self, weights, name):
+        rct = RCT(COVARIATES_PATH, weights, seed=0)
+        for i, assignment in enumerate([rct.assignment_from_iid,
+                                        rct.assignment_from_shuffled]):
             self.assert_assignment_matches(
                 cov_df, assignment, '{}_{}'.format(name, i))
