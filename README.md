@@ -1,5 +1,5 @@
-# rct
-[![Build Status](https://travis-ci.com/sylvaingchassang/xdesign.svg?branch=master)](https://travis-ci.com/sylvaingchassang/xdesign)
+# experiment-design
+[![Build Status](https://travis-ci.com/sylvaingchassang/experiment-design.svg?branch=master)](https://travis-ci.com/sylvaingchassang/experiment-design)
 
 ### What this package does
 
@@ -7,7 +7,7 @@ This package provides tools to generate robust and balanced random assignments
 following [Banerjee, Chassang, Montero, and Snowberg (2019)](https://www.sylvainchassang.org/assets/papers/adversarial_experimentation.pdf).
 
 The `RCT`, `KRerandomizedRCT`, and `QuantileTargetingRCT` classes of
- the `rct.design` module implement RCT, K-rerandomized
+ the `experiment-design.design` module implement RCT, K-rerandomized
  RCT, and Quantile Targeting RCT designs described in [Banerjee, Chassang, Montero, and Snowberg (2019)](https://www.sylvainchassang.org/assets/papers/adversarial_experimentation.pdf).
   
 For each design, `assignment_from_iid` draws designs selected from i.i.d. assignments;
@@ -18,7 +18,7 @@ For each design, `assignment_from_iid` draws designs selected from i.i.d. assign
 The package allows for an arbitrary number of treatment arms, specified via
 the `weights` argument in each design.
 
-`rct` implements various balance objectives, including:   
+`experiment-design` implements various balance objectives, including:   
  - minimizing the Mahalanobis distance between the mean of selected
     covariates  across treatment arms;   
  - maximizing the minimum p-value for the regression of covariates on
@@ -32,12 +32,12 @@ aggregating functions to the `BalanceObjective` constructor. For instance, this 
 
 ### Citation
 
-To cite `rct` in publications, use    
+To cite `experiment-design` in publications, use    
 ```
 Banerjee, Abhijit, Sylvain Chassang, Sergio Montero, and Erik Snowberg.   
 A theory of experimenters. No. w23867. National Bureau of Economic Research, 2017.
 ```
-Corresponding `bibtex` entry:   
+The corresponding `bibtex` entry is:   
 ```
 @techreport{banerjee2017theory,   
   title={A theory of experimenters},   
@@ -58,41 +58,41 @@ You may download the package via `pip`:
 
 this will install all required dependencies.
 
-Alternatively, you can clone (`git@github.com:sylvaingchassang/rct.git`) or [download a `.zip`](https://github.com/sylvaingchassang/rct/archive/master.zip) of the repo. If you
+Alternatively, you can clone (`git@github.com:sylvaingchassang/experiment-design.git`) or [download a `.zip`](https://github.com/sylvaingchassang/experiment-design/archive/master.zip) of the repo. If you
 do so you must install requirements for the package manually. With `pip`, run   
 
-`./rct$ pip install -r requirements.txt`
+`./experiment-design$ pip install -r requirements.txt`
 
 ### Running tests
 
 Before using the package, you may want to check that unit and
 integration tests pass on your machine. To this end, run
 
-`./rct$ pytest --cov=. --cov-report=term-missing`
+`./experiment-design$ pytest --cov=. --cov-report=term-missing`
 
 ### Examples
 
-Example notebooks illustrate the use of `rct` modules:
- - [`rct/notebooks/examples_rct.ipynb`](https://github.com/sylvaingchassang/rct/blob/master/notebooks/examples_rct.ipynb) shows how to generate
+Example notebooks illustrate the use of `experiment-design` modules:
+ - [`experiment-design/notebooks/examples_rct.ipynb`](https://github.com/sylvaingchassang/experiment-design/blob/master/notebooks/examples_rct.ipynb) shows how to generate
  traditional i.i.d. and shuffled RCT assignments for binary and ternary
  treatments. The `pvalue_report` function provides a useful summary of
  assignment balance by reporting the `(#treatments -1, #covariates)`
  matrix of p-values obtained from regressing covariates on different
  treatment dummies.
 
- - [`rct/notebooks/examples_k_rerandomized_rct.ipynb`](https://github.com/sylvaingchassang/rct/blob/master/notebooks/examples_k_rerandomized_rct.ipynb) shows how to
+ - [`experiment-design/notebooks/examples_k_rerandomized_rct.ipynb`](https://github.com/sylvaingchassang/experiment-design/blob/master/notebooks/examples_k_rerandomized_rct.ipynb) shows how to
  obtain k-rerandomized i.i.d. and shuffled assignments under various balance
   objectives.
 
-  - [`rct/notebooks/examples_quantile_targeting_rct.ipynb`](https://github.com/sylvaingchassang/rct/blob/master/notebooks/examples_quantile_targeting_rct.ipynb) performs a
+  - [`experiment-design/notebooks/examples_quantile_targeting_rct.ipynb`](https://github.com/sylvaingchassang/experiment-design/blob/master/notebooks/examples_quantile_targeting_rct.ipynb) performs a
    similar exercise for quantile targeting experiment designs.
 
-Integration tests located at `rct/tests/test_integration.py` replicate
+Integration tests located at `experiment-design/tests/test_integration.py` replicate
 the content of these notebooks.
 
 ### Contribute
 
-If you want to improve `rct` please reach out! 
+If you want to improve `experiment-design` please reach out! 
 
 Whether you are a programmer who wants to improve our code, or an experiment designer with a
 practical comment, or a new design idea, we want to talk to you!
