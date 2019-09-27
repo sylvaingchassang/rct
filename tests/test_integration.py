@@ -94,4 +94,4 @@ class TestIntegration(TestCase):
         for i, assignment in enumerate([qrct.assignment_from_iid,
                                         qrct.assignment_from_shuffled]):
             self.assert_assignment_matches(
-                cov_df, assignment, '{}_{}'.format(name, i), True)
+                cov_df, assignment, '{}_{}'.format(name, i))
