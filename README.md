@@ -4,36 +4,49 @@
 ### What this package does
 
 This package provides tools to generate robust and balanced random assignments
-following [Banerjee A., Chassang S., Montero S., Snowberg E.]
+following [Banerjee, Chassang, Montero S, and Snowberg (2019)](https://www.sylvainchassang.org/assets/papers/adversarial_experimentation.pdf).
 
 The package allows for an arbitrary number of treatment arms (specified via
 the `weights` argument).
 
-`xdesign` implements various balance objectives, including
+`xdesign` implements various balance objectives, including:   
     - minimizing the Mahalanobis distance between the mean of selected
-    covariates  across treatment arms;
+    covariates  across treatment arms;   
     - maximizing the minimum p-value for the regression of covariates on
-     treatment dummies;
-    - soft blocking on selected covariates;
+     treatment dummies;   
+    - soft blocking on selected covariates;   
     - linear combinations of existing objectives.
+
 Customizing balance functions is easy, either by passing appropriate
-``aggregating functions" to the `BalanceObjective` constructor, or by
+aggregating functions to the `BalanceObjective` constructor, or by
 defining a new class, inheriting from `BalanceObjective`  and implementing
 the abstract method `_balance_func`.
 
 Finally the `RCT`, `KRerandomizedRCT`, and `QuantileTargetingRCT` classes of
  the `xdesign.design` module implement the standard RCT, K-rerandomized
- experiment, and quantile targeting experiment designs described in [Banerjee
-  A., Chassang S., Montero S., Snowberg E. (2019)]. For each design,
-  `assignment_from_iid` draws designs selected from i.i.d. assignments;
+ experiment, and quantile targeting experiment designs described in [Banerjee, Chassang, Montero S, and Snowberg (2019)](https://www.sylvainchassang.org/assets/papers/adversarial_experimentation.pdf).
+  
+For each design, `assignment_from_iid` draws designs selected from i.i.d. assignments;
   `assignment_from_shuffled` draws designs selected from exchangeable
   assignments guaranteed to exactly match desired sampling weights (up to
   integer issues).
 
 ### Citation
 
-If you use this package, please cite
-[Banerjee A., Chassang S., Montero S., Snowberg E. (2019)].
+To cite `xdesign` in publications, use    
+```
+Banerjee, Abhijit, Sylvain Chassang, Sergio Montero, and Erik Snowberg.   
+A theory of experimenters. No. w23867. National Bureau of Economic Research, 2017.
+```
+Corresponding `bibtex` entry:   
+```
+@techreport{banerjee2017theory,   
+  title={A theory of experimenters},   
+  author={Banerjee, Abhijit and Chassang, Sylvain and Montero, Sergio and Snowberg, Erik},   
+  year={2017},   
+  institution={National Bureau of Economic Research}   
+}
+```
 
 ### Installation
 
