@@ -55,13 +55,14 @@ Linux 16.04.
 
 You may download the package via `pip`:
 
-`pip install xdesign`
+`$ pip install xdesign`
 
 this will install all required dependencies.
 
 Alternatively, you can [clone]() or [download a `.zip`]() the repo. If you
-do so you must install requirements for the package manually. With `pip`, run
-'./xdesign$ pip install -r requirements.txt'
+do so you must install requirements for the package manually. With `pip`, run   
+
+`./xdesign$ pip install -r requirements.txt`
 
 ### Running tests
 
