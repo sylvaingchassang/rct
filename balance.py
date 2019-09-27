@@ -7,7 +7,7 @@ from statsmodels.formula.api import ols
 from functools import partial
 
 from .utils import NumericFunction
-
+from .assignment import get_assignments_as_positions
 
 def identity(x): return x
 
@@ -17,9 +17,16 @@ def max_absolute_value(x): return np.max(np.abs(x))
 
 min_across_covariates = partial(np.min, axis=1)
 max_across_covariates = partial(np.max, axis=1)
+mean_across_covariates = partial(np.mean, axis=1)
 
 
 class BalanceObjective:
+
+    def __init__(self, cols=None):
+        self._cols = cols
+
+    def col_selection(self, df):
+        return self._cols or df.columns
 
     @property
     def balance_func(self):
@@ -50,13 +57,15 @@ class BalanceObjective:
 
 
 class MahalanobisBalance(BalanceObjective):
-    def __init__(self, treatment_aggregator=identity):
+    def __init__(self, treatment_aggregator=identity, cols=None):
         self.treatment_aggregator = treatment_aggregator
+        super().__init__(cols)
 
     def _balance_func(self, df, assignments):
-        inverse_cov = np.linalg.inv(df.cov())
-        means = [df.loc[idx].mean() for idx in
-                 self.assignment_indices(df, assignments)]
+        df_sel = df[self.col_selection(df)]
+        inverse_cov = np.linalg.inv(df_sel.cov())
+        means = [df_sel.loc[idx].mean() for idx in
+                 self.assignment_indices(df_sel, assignments)]
         combs = list(combinations(range(len(means)), 2))
         mean_diffs = [means[a] - means[b] for a, b in combs]
         res = pd.DataFrame(data=[mean_diff @ inverse_cov @ mean_diff
@@ -65,15 +74,20 @@ class MahalanobisBalance(BalanceObjective):
         return -self.treatment_aggregator(res)
 
 
+def mahalanobis_balance(cols=None):
+    return MahalanobisBalance(np.max, cols=cols).balance_func
+
+
 class PValueBalance(BalanceObjective):
     def __init__(self, treatment_aggreagtor=identity,
-                 covariate_aggregator=identity):
+                 covariate_aggregator=identity, cols=None):
         self.treatment_aggregator = treatment_aggreagtor
         self.covariate_aggregator = covariate_aggregator
+        super().__init__(cols)
 
     def _balance_func(self, df, assignments):
         pvalues = dict((col, self.pvalues_by_col(
-            col, df, assignments)) for col in df.columns)
+            col, df, assignments)) for col in self.col_selection(df))
         return self.covariate_aggregator(pd.DataFrame(pvalues))
 
     def pvalues_by_col(self, col, df, assignments):
@@ -101,24 +115,35 @@ class PValueBalance(BalanceObjective):
 
 
 def pvalues_report(df, assignments):
+    if isinstance(assignments, pd.DataFrame):
+        assignments = get_assignments_as_positions(assignments)
     report = PValueBalance().balance_func(df, assignments)
     idx = ['t{}'.format(i + 1) for i in range(len(report))]
     report.index = idx
     return report
 
 
+def pvalue_balance(cols=None):
+    return PValueBalance(
+        treatment_aggreagtor=np.min,
+        covariate_aggregator=min_across_covariates,
+        cols=cols
+    ).balance_func
+
+
 class BlockBalance(BalanceObjective):
 
     def __init__(self, treatment_aggreagtor=identity,
                  covariate_aggregator=identity,
-                 category_aggregator=max_absolute_value):
+                 category_aggregator=max_absolute_value, cols=None):
         self.treatment_aggregator = treatment_aggreagtor
         self.covariate_aggregator = covariate_aggregator
         self.category_aggregator = category_aggregator
+        super().__init__(cols)
 
     def _balance_func(self, df, assignments):
         relative_count_all = dict((col, self.relative_count_by_col(
-            col, df, assignments)) for col in df.columns)
+            col, df, assignments)) for col in self.col_selection(df))
         return -self.covariate_aggregator(pd.DataFrame(relative_count_all))
 
     def relative_count_by_col(self, col, df, assignments):
@@ -134,3 +159,8 @@ class BlockBalance(BalanceObjective):
         count = [[sum(df[col].loc[idx].eq(v)) for v in cat] for idx in idxs]
         return pd.DataFrame(data=count, columns=cat,
                             index=['t{}'.format(i) for i in range(len(idxs))])
+
+
+def block_balance(cols=None):
+    return BlockBalance(
+        np.max, max_across_covariates, cols=cols).balance_func

@@ -8,7 +8,8 @@ from ..assignment import get_assignments_as_positions
 
 class TestRCT(TestCase):
     def setUp(self) -> None:
-        self.file = path.join(path.dirname(__file__), 'example_covariates.csv')
+        self.file = path.join(path.dirname(__file__), 'test_data',
+                              'example_covariates.csv')
         self.rct = RCT(self.file, [.5, .5], 1)
 
     def test_hash_int(self):
@@ -49,7 +50,8 @@ class TestRCT(TestCase):
 
 class TestKRerandomized(TestCase):
     def setUp(self):
-        self.file = path.join(path.dirname(__file__), 'example_covariates.csv')
+        self.file = path.join(path.dirname(__file__), 'test_data',
+                              'example_covariates.csv')
         self.maha = MahalanobisBalance()
         self.krerand = KRerandomizedRCT(self.maha, self.file, [.5, .5])
 
@@ -92,7 +94,8 @@ class TestKRerandomized(TestCase):
 
 class TestQuantileTargetingRCT(TestCase):
     def setUp(self):
-        self.file = path.join(path.dirname(__file__), 'example_covariates.csv')
+        self.file = path.join(path.dirname(__file__),  'test_data',
+                              'example_covariates.csv')
         self.maha = MahalanobisBalance()
         self.qt_rct = QuantileTargetingRCT(
             self.maha, self.file, [.5, .5], .05, num_monte_carlo=100)
@@ -123,15 +126,11 @@ class TestQuantileTargetingRCT(TestCase):
     def test_iid_balance(self):
         assert_array_almost_equal(
             pvalues_report(
-                self.qt_rct.df,
-                get_assignments_as_positions(
-                    self.qt_rct.assignment_from_iid)),
-            [[0.87299 , 0.741099, 0.842654]])
+                self.qt_rct.df, self.qt_rct.assignment_from_iid),
+            [[0.87299, 0.741099, 0.842654]])
 
     def test_shuffled_balance(self):
         assert_array_almost_equal(
-            pvalues_report(
-                self.qt_rct.df,
-                get_assignments_as_positions(
-                    self.qt_rct.assignment_from_shuffled)),
+            pvalues_report(self.qt_rct.df,
+                           self.qt_rct.assignment_from_shuffled),
             [[0.82268, 0.82947, 0.551186]])
