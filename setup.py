@@ -4,17 +4,19 @@ with open("README.md", "r") as fh:
     long_description = fh.read()
 
 setuptools.setup(
-    name="xdesign",
+    name="experiment_design",
     version="0.0.1",
     author="Sylvain Chassang",
     author_email="sylvain.chassang@gmail.com",
     description="design robust balanced randomized experiments",
     long_description=long_description,
     long_description_content_type="text/markdown",
-    url="https://github.com/sylvaingchassang/xdesign",
+    url="https://github.com/sylvaingchassang/experiment_design",
     packages=setuptools.find_packages(),
     classifiers=[
         "Development Status :: 3 - Alpha",
+        "Intended Audience :: Science/Research",
+        "Topic :: Scientific/Engineering",
         "Programming Language :: Python :: 3",
         "License :: OSI Approved :: MIT License",
         "Operating System :: OS Independent",

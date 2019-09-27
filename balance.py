@@ -9,6 +9,7 @@ from functools import partial
 from .utils import NumericFunction
 from .assignment import get_assignments_as_positions
 
+
 def identity(x): return x
 
 
