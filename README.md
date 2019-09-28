@@ -54,7 +54,7 @@ Linux 16.04.
 
 You may download the package via `pip`:
 
-`$ pip install experiment_design`
+`$ pip install experiment-design`
 
 this will install all required dependencies.
 
