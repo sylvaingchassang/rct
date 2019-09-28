@@ -54,7 +54,7 @@ Linux 16.04.
 
 You may download the package via `pip`:
 
-`$ pip install experiment-design`
+`$ pip install rct`
 
 this will install all required dependencies.
 
