@@ -4,14 +4,14 @@ with open("README.md", "r") as fh:
     long_description = fh.read()
 
 setuptools.setup(
-    name="experiment_design",
+    name="rct",
     version="0.0.1",
     author="Sylvain Chassang",
     author_email="sylvain.chassang@gmail.com",
     description="design robust balanced randomized experiments",
     long_description=long_description,
     long_description_content_type="text/markdown",
-    url="https://github.com/sylvaingchassang/experiment_design",
+    url="https://github.com/sylvaingchassang/rct",
     packages=setuptools.find_packages(),
     classifiers=[
         "Development Status :: 3 - Alpha",
