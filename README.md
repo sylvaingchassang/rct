@@ -35,15 +35,22 @@ aggregating functions to the `BalanceObjective` constructor. For instance, this 
 To cite `rct` in publications, use    
 ```
 Banerjee, Abhijit, Sylvain Chassang, Sergio Montero, and Erik Snowberg.   
-A theory of experimenters. No. w23867. National Bureau of Economic Research, 2017.
+A theory of experimenters. NBER Working Paper No. w23867. National Bureau of Economic Research, 2017.
 ```
-The corresponding `bibtex` entry is:   
+The corresponding [`bibtex` entry](w23867.bib) is:   
 ```
-@techreport{banerjee2017theory,   
-  title={A theory of experimenters},   
-  author={Banerjee, Abhijit and Chassang, Sylvain and Montero, Sergio and Snowberg, Erik},   
-  year={2017},   
-  institution={National Bureau of Economic Research}   
+@techreport{NBERw23867,
+ title = "A Theory of Experimenters",
+ author = "Banerjee, Abhijit and Chassang, Sylvain and Montero, Sergio and Snowberg, Erik",
+ institution = "National Bureau of Economic Research",
+ type = "Working Paper",
+ series = "Working Paper Series",
+ number = "23867",
+ year = "2017",
+ month = "September",
+ doi = {10.3386/w23867},
+ URL = "http://www.nber.org/papers/w23867",
+ abstract = {This paper proposes a decision-theoretic framework for experiment design. We model experimenters as ambiguity-averse decision-makers, who make trade-offs between subjective expected performance and robustness. This framework accounts for experimenters' preference for randomization, and clarifies the circumstances in which randomization is optimal: when the available sample size is large enough or robustness is an important concern. We illustrate the practical value of such a framework by studying the issue of rerandomization. Rerandomization creates a trade-off between subjective performance and robustness. However,  robustness loss grows very slowly with the number of times one randomizes. This argues for rerandomizing in most environments.},
 }
 ```
 
