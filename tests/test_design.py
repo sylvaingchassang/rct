@@ -1,3 +1,4 @@
+import pandas as pd
 from numpy.testing import TestCase, assert_array_almost_equal
 from os import path
 
@@ -11,6 +12,16 @@ class TestRCT(TestCase):
         self.file = path.join(path.dirname(__file__), 'test_data',
                               'example_covariates.csv')
         self.rct = RCT(self.file, [.5, .5], 1)
+
+    def test_load_from_df(self):
+        this_df = pd.read_csv(self.file)
+        this_rct = RCT(this_df, [.5, .5], 1)
+        assert (this_rct.sample_size == 100)
+        assert (this_rct.seed == 1)
+        assert (this_rct.file_hash_int == 0)
+        assert_array_almost_equal(
+            this_rct.assignment_from_shuffled.mean(), [.5])
+        assert_array_almost_equal(this_rct.assignment_from_iid.mean(), 0.49)
 
     def test_hash_int(self):
         assert (self.rct.file_hash_int ==

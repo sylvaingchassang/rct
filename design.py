@@ -13,14 +13,20 @@ from .utils import QuantileTarget
 
 
 class RCTBase:
-    def __init__(self, file_path, weights, seed=0):
-        self.file_path = file_path
+    def __init__(self, file_path_or_frame, weights, seed=0):
         self.weights = weights
         self.shift_seed = seed
-        self.df = pd.read_csv(file_path)
+        if isinstance(file_path_or_frame, pd.DataFrame):
+            self.file_path = None
+            self.df = file_path_or_frame.copy()
+        else:
+            self.file_path = file_path_or_frame
+            self.df = pd.read_csv(file_path_or_frame)
 
     @lazy_property.LazyProperty
     def file_hash_int(self):
+        if self.file_path is None:
+            return 0
         hasher = md5()
         with open(self.file_path, 'rb') as fh:
             buf = fh.read()
@@ -72,8 +78,8 @@ class RCT(RCTBase):
 
 
 class BalancedRCTBase(RCTBase):
-    def __init__(self, objective, file_path, weights, k=None, seed=0):
-        super().__init__(file_path, weights, seed)
+    def __init__(self, objective, file_path_or_frame, weights, k=None, seed=0):
+        super().__init__(file_path_or_frame, weights, seed)
         self._balance = objective.balance_func \
             if isinstance(objective, BalanceObjective) else objective
         self._k = k
@@ -111,9 +117,9 @@ class KRerandomizedRCT(BalancedRCTBase):
 
 
 class QuantileTargetingRCT(BalancedRCTBase):
-    def __init__(self, objective, file_path, weights,
+    def __init__(self, objective, file_path_or_frame, weights,
                  quantile_target=None, seed=0, num_monte_carlo=1000):
-        super().__init__(objective, file_path, weights, num_monte_carlo, seed)
+        super().__init__(objective, file_path_or_frame, weights, num_monte_carlo, seed)
         self.quantile_target = quantile_target
 
     def balance(self, assignment):
