@@ -1,5 +1,5 @@
 # rct
-[![Build Status](https://travis-ci.com/sylvaingchassang/rct.svg?branch=master)](https://travis-ci.com/sylvaingchassang/rct)
+[![Build Status](https://github.com/sylvaingchassang/rct/actions/workflows/test_rct.yml/badge.svg)](https://github.com/sylvaingchassang/rct/actions/workflows/test_rct.yml/badge.svg)
 
 ### What this package does
 
