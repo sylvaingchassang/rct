@@ -65,7 +65,7 @@ You may download the package via `pip`:
 
 this will install all required dependencies.
 
-Alternatively, you can clone (`git@github.com:sylvaingchassang/rct.git`) or [download a `.zip`](https://github.com/sylvaingchassang/rct/archive/master.zip) of the repo. If you
+Alternatively, if you want to use recent updates, you can clone (`git@github.com:sylvaingchassang/rct.git`) or [download a `.zip`](https://github.com/sylvaingchassang/rct/archive/master.zip) of the repo. If you
 do so you must install requirements for the package manually. With `pip`, run   
 
 `./rct$ pip install -r requirements.txt`
